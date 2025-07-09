@@ -104,7 +104,7 @@ const WritingModal: React.FC<WritingModalProps> = ({ writingId, onClose }) => {
           <img
             src={writingDetail.imageUrl}
             alt={writingDetail.title}
-            className="w-full h-64 object-cover rounded-lg mb-6 shadow-md"
+            className="w-full h-24 object-cover rounded-lg mb-6 shadow-md"
             onError={(e) => {
               e.currentTarget.src = `https://placehold.co/600x400/cccccc/333333?text=Gambar+Gagal+Dimuat`;
             }}
