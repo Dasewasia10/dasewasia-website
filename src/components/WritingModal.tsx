@@ -156,10 +156,9 @@ const WritingModal: React.FC<WritingModalProps> = ({ writingId, onClose }) => {
         )}
         {/* Isi Tulisan */}
         <div className="prose dark:prose-invert max-w-none text-gray-800 dark:text-gray-200 leading-relaxed">
-          {/* Menggunakan dangerouslySetInnerHTML jika konten berasal dari HTML/Markdown */}
-          <p>{writingDetail.fullContent}</p>
-          {/* Atau jika konten adalah HTML yang aman, gunakan: */}
-          {/* <div dangerouslySetInnerHTML={{ __html: writingDetail.fullContent }} /> */}
+          <div
+            dangerouslySetInnerHTML={{ __html: writingDetail.fullContent }}
+          />
         </div>
       </div>
     </div>
