@@ -55,7 +55,7 @@ function App() {
       />
 
       {/* Area Konten Utama - akan diisi oleh Routes/Route */}
-      <main className="overflow-y-auto p-4 md:p-8 flex-1 md:w-[calc(100vw-17rem)] z-10">
+      <main className="overflow-y-auto p-4 md:p-8 flex-1 md:w-[calc(100vw-17rem)]">
         <Routes>
           {" "}
           {/* Gunakan Routes untuk mendefinisikan rute */}
