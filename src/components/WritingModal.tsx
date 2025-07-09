@@ -64,7 +64,7 @@ const WritingModal: React.FC<WritingModalProps> = ({ writingId, onClose }) => {
     if (writingId) {
       fetchWritingDetail();
     }
-  }, [writingId]); // Panggil ulang saat writingId berubah
+  }, [writingId]);
 
   // Log di setiap render untuk melacak status komponen
   console.log(
@@ -84,7 +84,6 @@ const WritingModal: React.FC<WritingModalProps> = ({ writingId, onClose }) => {
           <p className="text-lg text-gray-700 dark:text-gray-300">
             Memuat tulisan...
           </p>
-          {/* Anda bisa menambahkan spinner loading di sini */}
         </div>
       </div>
     );
@@ -108,11 +107,10 @@ const WritingModal: React.FC<WritingModalProps> = ({ writingId, onClose }) => {
   }
 
   if (!writingDetail) {
-    // Log ini akan sangat membantu jika modal menghilang tanpa error
     console.log(
       "WritingModal: writingDetail is null, returning null (This indicates fetch failed silently or data is empty)"
     );
-    return null; // Atau tampilkan pesan "Tulisan tidak ditemukan"
+    return null;
   }
 
   console.log(
@@ -120,10 +118,12 @@ const WritingModal: React.FC<WritingModalProps> = ({ writingId, onClose }) => {
     writingDetail.title
   );
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 p-4 overflow-y-auto">
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-2xl p-6 md:p-8 max-w-3xl w-full relative transform transition-all duration-300 scale-95 animate-modal-in">
+    <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 p-4">
+      {" "}
+      {/* <<< overflow-y-auto DIHAPUS DARI SINI */}
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-2xl p-6 md:p-8 max-w-3xl w-full relative transform transition-all duration-300 scale-95 animate-modal-in max-h-[90vh] overflow-y-auto">
         {" "}
-        {/* <<< PENTING: opacity-0 DIHAPUS DI SINI */}
+        {/* <<< max-h-[90vh] dan overflow-y-auto DITAMBAHKAN DI SINI */}
         {/* Tombol Tutup */}
         <button
           onClick={onClose}
@@ -144,7 +144,7 @@ const WritingModal: React.FC<WritingModalProps> = ({ writingId, onClose }) => {
           <img
             src={writingDetail.imageUrl}
             alt={writingDetail.title}
-            className="w-full h-64 object-cover rounded-lg mb-6 shadow-md" // <<< PENTING: h-24 diubah menjadi h-64
+            className="w-full h-64 object-cover rounded-lg mb-6 shadow-md"
             onError={(e) => {
               e.currentTarget.src = `https://placehold.co/600x400/cccccc/333333?text=Gambar+Gagal+Dimuat`;
               console.error(
@@ -154,12 +154,11 @@ const WritingModal: React.FC<WritingModalProps> = ({ writingId, onClose }) => {
             }}
           />
         )}
-        {/* Isi Tulisan */}
-        <div className="prose dark:prose-invert max-w-none text-gray-800 dark:text-gray-200 leading-relaxed">
-          <div
-            dangerouslySetInnerHTML={{ __html: writingDetail.fullContent }}
-          />
-        </div>
+        {/* Isi Tulisan - Menggunakan dangerouslySetInnerHTML untuk HTML yang kaya */}
+        <div
+          className="prose dark:prose-invert max-w-none text-gray-800 dark:text-gray-200 leading-relaxed"
+          dangerouslySetInnerHTML={{ __html: writingDetail.fullContent }}
+        />
       </div>
     </div>
   );
