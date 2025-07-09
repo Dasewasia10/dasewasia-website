@@ -43,18 +43,6 @@ const Navbar: React.FC<NavbarProps> = ({ activeSection, setActiveSection }) => {
 
   return (
     <nav className="w-full md:w-64 flex md:flex-col justify-around md:justify-start items-center bg-white dark:bg-gray-800 shadow-lg md:shadow-xl p-4 md:p-6 md:h-screen md:sticky md:top-0 z-20">
-      {/* Untuk Mobile: Avatar/Nama di Nav Atas */}
-      <div className="md:hidden flex items-center gap-4 mb-0">
-        <img
-          src={`${API_BASE_URL}/img/profilepic/p1`} // Ganti dengan URL avatar Anda
-          alt="Avatar"
-          className="rounded-full w-12 h-12 object-cover border-2 border-blue-500"
-        />
-        <h2 className="text-xl font-bold text-gray-800 dark:text-gray-200">
-          Dasewasia
-        </h2>
-      </div>
-
       {/* Untuk Desktop: Avatar/Nama di Nav Kiri */}
       <div className="hidden md:block mb-8 text-center">
         <img

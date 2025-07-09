@@ -50,7 +50,7 @@ const ConnectPage: React.FC = () => {
   };
 
   return (
-    <section className="py-8 flex flex items-center text-center w-full gap-4 justify-center h-full">
+    <section className="py-8 flex flex-col md:flex-row items-center text-center w-full gap-4 justify-center h-full">
       <div>
         <h2 className="text-4xl font-bold mb-10 text-blue-600 dark:text-blue-400">
           Terhubung Dengan Saya
@@ -165,7 +165,7 @@ const ConnectPage: React.FC = () => {
           >
             {status === "loading" ? "Mengirim..." : "Kirim Pesan"}
           </button>
-          
+
           {/* Pesan status */}
           {responseMessage && (
             <div

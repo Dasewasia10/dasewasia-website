@@ -1,5 +1,7 @@
 import React from "react";
 
+const API_BASE_URL = "https://dasewasia.my.id/api/";
+
 const HomePage: React.FC = () => {
   return (
     <section className="min-h-[calc(100vh-10rem)] md:min-h-full flex flex-col justify-center items-center text-center p-4">
@@ -8,9 +10,20 @@ const HomePage: React.FC = () => {
       </h2>
       <span className="text-xl md:text-2xl leading-relaxed max-w-3xl text-gray-700 dark:text-gray-300 mb-8 animate-fade-in delay-200">
         Saya adalah seorang <strong>Freelancer</strong> dengan passion di bidang{" "}
-        <strong>ilustrasi</strong>. Suka mengotak-atik kode,
-        berkreasi, dan berbagi cerita melalui tulisan.
+        <strong>ilustrasi</strong>. Suka mengotak-atik kode, berkreasi, dan
+        berbagi cerita melalui tulisan.
       </span>
+      {/* Untuk Mobile: Avatar/Nama di Nav Atas */}
+      <div className="md:hidden flex items-center gap-4 mb-4">
+        <img
+          src={`${API_BASE_URL}/img/profilepic/p1`} // Ganti dengan URL avatar Anda
+          alt="Avatar"
+          className="rounded-full w-12 h-12 object-cover border-2 border-blue-500"
+        />
+        <h2 className="text-xl font-bold text-gray-800 dark:text-gray-200">
+          Dasewasia
+        </h2>
+      </div>
       <div className="flex flex-wrap justify-center gap-4 animate-fade-in delay-400">
         <a
           href="portfolio" // Ganti dengan logika navigasi jika tidak pakai anchor

@@ -121,7 +121,7 @@ const WritingModal: React.FC<WritingModalProps> = ({ writingId, onClose }) => {
     <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 p-4">
       {" "}
       {/* <<< overflow-y-auto DIHAPUS DARI SINI */}
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-2xl p-6 md:p-8 max-w-3xl w-full relative transform transition-all duration-300 scale-95 animate-modal-in max-h-[90vh] overflow-y-auto">
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-2xl p-6 md:p-8 max-w-3xl w-full relative transform transition-all duration-300 scale-95 animate-modal-in max-h-4/5 md:max-h-[90vh] overflow-y-auto">
         {" "}
         {/* <<< max-h-[90vh] dan overflow-y-auto DITAMBAHKAN DI SINI */}
         {/* Tombol Tutup */}
