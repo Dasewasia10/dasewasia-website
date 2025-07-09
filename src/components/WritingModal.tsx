@@ -23,13 +23,25 @@ const WritingModal: React.FC<WritingModalProps> = ({ writingId, onClose }) => {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    // Log untuk melacak kapan useEffect ini berjalan dan untuk ID apa
+    console.log("WritingModal useEffect: fetching for ID", writingId);
+
     const fetchWritingDetail = async () => {
       setLoading(true);
       setError(null);
+      setWritingDetail(null); // Reset detail sebelum fetch baru dimulai
+
       try {
         const response = await fetch(`${API_BASE_URL}writings/${writingId}`);
         if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
+          // Tangkap respons teks untuk informasi error yang lebih detail
+          const errorBody = await response.text();
+          console.error(
+            `Fetch failed with status ${response.status}: ${errorBody}`
+          );
+          throw new Error(
+            `HTTP error! status: ${response.status} - ${errorBody}`
+          );
         }
         const data: WritingDetail = await response.json();
         setWritingDetail(data);
@@ -38,6 +50,14 @@ const WritingModal: React.FC<WritingModalProps> = ({ writingId, onClose }) => {
         setError("Gagal memuat konten tulisan. Silakan coba lagi.");
       } finally {
         setLoading(false);
+        // Log status akhir setelah fetch selesai
+        // Perhatikan: 'error' di sini mungkin masih nilai dari closure sebelumnya jika error baru saja di-set
+        console.log(
+          "WritingModal fetch finished. Loading:",
+          false,
+          "Error state after fetch:",
+          error
+        );
       }
     };
 
@@ -46,7 +66,18 @@ const WritingModal: React.FC<WritingModalProps> = ({ writingId, onClose }) => {
     }
   }, [writingId]); // Panggil ulang saat writingId berubah
 
+  // Log di setiap render untuk melacak status komponen
+  console.log(
+    "WritingModal render: loading=",
+    loading,
+    "error=",
+    error,
+    "writingDetail=",
+    writingDetail
+  );
+
   if (loading) {
+    console.log("WritingModal: Rendering loading state");
     return (
       <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 p-4">
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-2xl p-8 max-w-2xl w-full text-center">
@@ -60,6 +91,7 @@ const WritingModal: React.FC<WritingModalProps> = ({ writingId, onClose }) => {
   }
 
   if (error) {
+    console.log("WritingModal: Rendering error state");
     return (
       <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 p-4">
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-2xl p-8 max-w-2xl w-full text-center">
@@ -76,12 +108,22 @@ const WritingModal: React.FC<WritingModalProps> = ({ writingId, onClose }) => {
   }
 
   if (!writingDetail) {
+    // Log ini akan sangat membantu jika modal menghilang tanpa error
+    console.log(
+      "WritingModal: writingDetail is null, returning null (This indicates fetch failed silently or data is empty)"
+    );
     return null; // Atau tampilkan pesan "Tulisan tidak ditemukan"
   }
 
+  console.log(
+    "WritingModal: Rendering actual modal content for",
+    writingDetail.title
+  );
   return (
     <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 p-4 overflow-y-auto">
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-2xl p-6 md:p-8 max-w-3xl w-full relative transform transition-all duration-300 scale-95 opacity-0 animate-modal-in">
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-2xl p-6 md:p-8 max-w-3xl w-full relative transform transition-all duration-300 scale-95 animate-modal-in">
+        {" "}
+        {/* <<< PENTING: opacity-0 DIHAPUS DI SINI */}
         {/* Tombol Tutup */}
         <button
           onClick={onClose}
@@ -90,7 +132,6 @@ const WritingModal: React.FC<WritingModalProps> = ({ writingId, onClose }) => {
         >
           &times;
         </button>
-
         {/* Header */}
         <h2 className="text-3xl font-bold mb-4 text-blue-600 dark:text-blue-400">
           {writingDetail.title}
@@ -98,21 +139,23 @@ const WritingModal: React.FC<WritingModalProps> = ({ writingId, onClose }) => {
         <p className="text-sm text-gray-500 dark:text-gray-400 mb-6">
           Tanggal: {writingDetail.date}
         </p>
-
         {/* Gambar (jika ada) */}
         {writingDetail.imageUrl && (
           <img
             src={writingDetail.imageUrl}
             alt={writingDetail.title}
-            className="w-full h-24 object-cover rounded-lg mb-6 shadow-md"
+            className="w-full h-64 object-cover rounded-lg mb-6 shadow-md" // <<< PENTING: h-24 diubah menjadi h-64
             onError={(e) => {
               e.currentTarget.src = `https://placehold.co/600x400/cccccc/333333?text=Gambar+Gagal+Dimuat`;
+              console.error(
+                "Failed to load image within modal:",
+                writingDetail.imageUrl
+              );
             }}
           />
         )}
-
         {/* Isi Tulisan */}
-        <div className="text-gray-800 dark:text-gray-200">
+        <div className="prose dark:prose-invert max-w-none text-gray-800 dark:text-gray-200 leading-relaxed">
           {/* Menggunakan dangerouslySetInnerHTML jika konten berasal dari HTML/Markdown */}
           <p>{writingDetail.fullContent}</p>
           {/* Atau jika konten adalah HTML yang aman, gunakan: */}
