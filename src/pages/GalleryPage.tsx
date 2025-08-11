@@ -2,7 +2,6 @@ import React, { useState, useEffect, useCallback } from "react";
 import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/24/solid";
 
 // Data mock untuk kategori dan nama gambar.
-// Dalam aplikasi nyata, ini akan diambil dari API backend.
 const imageManifest: { [key: string]: string[] } = {
   fanart: ["gochiusa_collab", "kana", "yu_moshikoi"],
   commission: ["unxinus", "molen_pisang", "green_girl"],
@@ -28,8 +27,8 @@ const GalleryPage: React.FC = () => {
     setMainImageLoaded(false);
     const images = imageManifest[selectedCategory] || [];
     setImagesInCurrentCategory(images);
-    setCurrentImageIndex(0); // Selalu mulai dari gambar pertama di kategori baru
-    setLoading(false); // Selesai memuat data mock
+    setCurrentImageIndex(0);
+    setLoading(false); 
   }, [selectedCategory]);
 
   // Fungsi untuk mendapatkan URL gambar
@@ -40,15 +39,12 @@ const GalleryPage: React.FC = () => {
     []
   );
 
-  console.log(`Selected Category: ${selectedCategory}`);
-  console.log(`Current Image Index: ${currentImageIndex}`);
-
   // Fungsi untuk navigasi gambar
   const navigateImage = useCallback(
     (direction: "prev" | "next") => {
       if (imagesInCurrentCategory.length === 0) return;
 
-      setMainImageLoaded(false); // Reset status loaded untuk transisi gambar baru
+      setMainImageLoaded(false);
 
       let newIndex = currentImageIndex;
       if (direction === "next") {
