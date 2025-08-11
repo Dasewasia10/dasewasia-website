@@ -142,38 +142,47 @@ const WritingsPage: React.FC = () => {
       ) : (
         // Tampilkan daftar tulisan dalam grid jika data berhasil dimuat
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {writings.map((writing) => (
-            <div
-              key={writing._id}
-              className="bg-white dark:bg-gray-800 rounded-lg shadow-xl p-6 transform transition duration-300 hover:scale-105 hover:shadow-2xl cursor-pointer"
-              onClick={() => openWritingModal(writing.slug.current)} // Ketika kartu diklik, buka modal
-            >
-              {/* Tampilkan gambar jika ada */}
-              {writing.mainImage.asset.url && (
-                <img
-                  src={writing.mainImage.asset.url}
-                  alt={writing.title}
-                  className="w-full h-40 object-cover rounded-md mb-4"
-                  // Fallback gambar jika gagal dimuat
-                  onError={(e) => {
-                    e.currentTarget.src = `https://placehold.co/400x160/cccccc/333333?text=Gambar+Gagal`;
-                  }}
-                />
-              )}
-              {/* Judul tulisan */}
-              <h3 className="text-xl font-semibold mb-2 text-gray-800 dark:text-gray-100">
-                {writing.title}
-              </h3>
-              {/* Cuplikan tulisan */}
-              <p className="text-gray-600 dark:text-gray-300 text-sm mb-4 line-clamp-3">
-                {writing.excerpt}
-              </p>
-              {/* Tanggal tulisan */}
-              <p className="text-gray-500 dark:text-gray-400 text-xs mb-4">
-                {writing.publishedAt}
-              </p>
-            </div>
-          ))}
+          {writings.map((writing) =>
+            writing.slug && writing.slug.current ? (
+              <div
+                key={writing._id}
+                className="bg-white dark:bg-gray-800 rounded-lg shadow-xl p-6 transform transition duration-300 hover:scale-105 hover:shadow-2xl cursor-pointer"
+                onClick={() => openWritingModal(writing.slug.current)} // Ketika kartu diklik, buka modal
+              >
+                {/* Tampilkan gambar jika ada */}
+                {writing.mainImage.asset.url && (
+                  <img
+                    src={writing.mainImage.asset.url}
+                    alt={writing.title}
+                    className="w-full h-40 object-cover rounded-md mb-4"
+                    // Fallback gambar jika gagal dimuat
+                    onError={(e) => {
+                      e.currentTarget.src = `https://placehold.co/400x160/cccccc/333333?text=Gambar+Gagal`;
+                    }}
+                  />
+                )}
+                {/* Judul tulisan */}
+                <h3 className="text-xl font-semibold mb-2 text-gray-800 dark:text-gray-100">
+                  {writing.title}
+                </h3>
+                {/* Cuplikan tulisan */}
+                <p className="text-gray-600 dark:text-gray-300 text-sm mb-4 line-clamp-3">
+                  {writing.excerpt}
+                </p>
+                {/* Tanggal tulisan */}
+                <p className="text-gray-500 dark:text-gray-400 text-xs mb-4">
+                  {writing.publishedAt}
+                </p>
+              </div>
+            ) : (
+              // Jika slug tidak ada, tidak tampilkan tulisan ini atau tampilkan pesan error
+              <div key={writing._id}>
+                <p className="text-red-500">
+                  Tulisan ini tidak valid (tanpa slug).
+                </p>
+              </div>
+            )
+          )}
         </div>
       )}
 
