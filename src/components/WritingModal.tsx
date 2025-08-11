@@ -1,49 +1,118 @@
 import React, { useEffect, useState } from "react";
+import sanityClient from "../sanityClient";
+import { PortableText } from "@portabletext/react";
+
+// interface WritingDetail {
+//   id: number;
+//   title: string;
+//   fullContent: string;
+//   imageUrl?: string; // Opsional: URL gambar untuk tulisan
+//   date: string;
+// }
+
+// interface WritingModalProps {
+//   writingId: number;
+//   onClose: () => void;
+// }
 
 interface WritingDetail {
-  id: number;
+  _id: string;
   title: string;
-  fullContent: string;
-  imageUrl?: string; // Opsional: URL gambar untuk tulisan
-  date: string;
+  body: any[]; // Sanity Portable Text
+  mainImage: {
+    asset: {
+      _ref: string;
+    };
+  };
+  publishedAt: string;
+  slug: {
+    current: string;
+  };
 }
 
 interface WritingModalProps {
-  writingId: number;
+  writingSlug: string; // Ganti ID dengan slug agar URL lebih bersih
   onClose: () => void;
 }
 
-const API_BASE_URL = "https://dasewasia.my.id/api/"; // Sesuaikan dengan URL backend Anda
+// const API_BASE_URL = "https://dasewasia.my.id/api/"; // Sesuaikan dengan URL backend Anda
 
-const WritingModal: React.FC<WritingModalProps> = ({ writingId, onClose }) => {
+const WritingModal: React.FC<WritingModalProps> = ({
+  writingSlug,
+  onClose,
+}) => {
   const [writingDetail, setWritingDetail] = useState<WritingDetail | null>(
     null
   );
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
+  // useEffect(() => {
+  //   // Log untuk melacak kapan useEffect ini berjalan dan untuk ID apa
+  //   console.log("WritingModal useEffect: fetching for ID", writingId);
+
+  //   const fetchWritingDetail = async () => {
+  //     setLoading(true);
+  //     setError(null);
+  //     setWritingDetail(null); // Reset detail sebelum fetch baru dimulai
+
+  //     try {
+  //       const response = await fetch(`${API_BASE_URL}writings/${writingId}`);
+  //       if (!response.ok) {
+  //         // Tangkap respons teks untuk informasi error yang lebih detail
+  //         const errorBody = await response.text();
+  //         console.error(
+  //           `Fetch failed with status ${response.status}: ${errorBody}`
+  //         );
+  //         throw new Error(
+  //           `HTTP error! status: ${response.status} - ${errorBody}`
+  //         );
+  //       }
+  //       const data: WritingDetail = await response.json();
+  //       setWritingDetail(data);
+  //     } catch (err) {
+  //       console.error("Gagal memuat detail tulisan:", err);
+  //       setError("Gagal memuat konten tulisan. Silakan coba lagi.");
+  //     } finally {
+  //       setLoading(false);
+  //       // Log status akhir setelah fetch selesai
+  //       // Perhatikan: 'error' di sini mungkin masih nilai dari closure sebelumnya jika error baru saja di-set
+  //       console.log(
+  //         "WritingModal fetch finished. Loading:",
+  //         false,
+  //         "Error state after fetch:",
+  //         error
+  //       );
+  //     }
+  //   };
+
+  //   if (writingId) {
+  //     fetchWritingDetail();
+  //   }
+  // }, [writingId]);
+
+  // Log di setiap render untuk melacak status komponen
+
   useEffect(() => {
-    // Log untuk melacak kapan useEffect ini berjalan dan untuk ID apa
-    console.log("WritingModal useEffect: fetching for ID", writingId);
-
     const fetchWritingDetail = async () => {
-      setLoading(true);
-      setError(null);
-      setWritingDetail(null); // Reset detail sebelum fetch baru dimulai
-
+      // ... (loading state)
       try {
-        const response = await fetch(`${API_BASE_URL}writings/${writingId}`);
-        if (!response.ok) {
-          // Tangkap respons teks untuk informasi error yang lebih detail
-          const errorBody = await response.text();
-          console.error(
-            `Fetch failed with status ${response.status}: ${errorBody}`
-          );
-          throw new Error(
-            `HTTP error! status: ${response.status} - ${errorBody}`
-          );
-        }
-        const data: WritingDetail = await response.json();
+        // Query berdasarkan slug untuk mendapatkan detail tulisan
+        const query = `*[_type == "writing" && slug.current == $writingSlug][0]{
+                    _id,
+                    title,
+                    body,
+                    publishedAt,
+                    mainImage{
+                        asset->{
+                            _id,
+                            url
+                        }
+                    },
+                    "fullContent": body // Sanity Portable Text
+                }`;
+        const params = { writingSlug };
+        const data: WritingDetail = await sanityClient.fetch(query, params);
         setWritingDetail(data);
       } catch (err) {
         console.error("Gagal memuat detail tulisan:", err);
@@ -61,12 +130,11 @@ const WritingModal: React.FC<WritingModalProps> = ({ writingId, onClose }) => {
       }
     };
 
-    if (writingId) {
+    if (writingSlug) {
       fetchWritingDetail();
     }
-  }, [writingId]);
+  }, [writingSlug]);
 
-  // Log di setiap render untuk melacak status komponen
   console.log(
     "WritingModal render: loading=",
     loading,
@@ -137,19 +205,19 @@ const WritingModal: React.FC<WritingModalProps> = ({ writingId, onClose }) => {
           {writingDetail.title}
         </h2>
         <p className="text-sm text-gray-500 dark:text-gray-400 mb-6">
-          Tanggal: {writingDetail.date}
+          Tanggal: {writingDetail.publishedAt}
         </p>
         {/* Gambar (jika ada) */}
-        {writingDetail.imageUrl && (
+        {writingDetail.mainImage.asset._ref && (
           <img
-            src={writingDetail.imageUrl}
+            src={writingDetail.mainImage.asset._ref}
             alt={writingDetail.title}
             className="w-full h-64 object-cover rounded-lg mb-6 shadow-md"
             onError={(e) => {
               e.currentTarget.src = `https://placehold.co/600x400/cccccc/333333?text=Gambar+Gagal+Dimuat`;
               console.error(
                 "Failed to load image within modal:",
-                writingDetail.imageUrl
+                writingDetail.mainImage.asset._ref
               );
             }}
           />
@@ -157,8 +225,11 @@ const WritingModal: React.FC<WritingModalProps> = ({ writingId, onClose }) => {
         {/* Isi Tulisan - Menggunakan dangerouslySetInnerHTML untuk HTML yang kaya */}
         <div
           className="prose dark:prose-invert max-w-none text-gray-800 dark:text-gray-200 leading-relaxed"
-          dangerouslySetInnerHTML={{ __html: writingDetail.fullContent }}
+          dangerouslySetInnerHTML={{ __html: writingDetail.body }}
         />
+        <div className="prose dark:prose-invert max-w-none">
+          <PortableText value={writingDetail.body} components={{}} />
+        </div>
       </div>
     </div>
   );
