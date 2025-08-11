@@ -18,6 +18,7 @@ interface Writing {
   mainImage: {
     asset: {
       _ref: string; // Referensi gambar di Sanity
+      url: string;
     };
   };
   slug: {
@@ -145,12 +146,12 @@ const WritingsPage: React.FC = () => {
             <div
               key={writing._id}
               className="bg-white dark:bg-gray-800 rounded-lg shadow-xl p-6 transform transition duration-300 hover:scale-105 hover:shadow-2xl cursor-pointer"
-              onClick={() => openWritingModal(writing._id)} // Ketika kartu diklik, buka modal
+              onClick={() => openWritingModal(writing.slug.current)} // Ketika kartu diklik, buka modal
             >
               {/* Tampilkan gambar jika ada */}
-              {writing.mainImage.asset._ref && (
+              {writing.mainImage.asset.url && (
                 <img
-                  src={writing.mainImage.asset._ref}
+                  src={writing.mainImage.asset.url}
                   alt={writing.title}
                   className="w-full h-40 object-cover rounded-md mb-4"
                   // Fallback gambar jika gagal dimuat

@@ -22,6 +22,7 @@ interface WritingDetail {
   mainImage: {
     asset: {
       _ref: string;
+      url: string;
     };
   };
   publishedAt: string;
@@ -208,16 +209,16 @@ const WritingModal: React.FC<WritingModalProps> = ({
           Tanggal: {writingDetail.publishedAt}
         </p>
         {/* Gambar (jika ada) */}
-        {writingDetail.mainImage.asset._ref && (
+        {writingDetail.mainImage.asset.url && (
           <img
-            src={writingDetail.mainImage.asset._ref}
+            src={writingDetail.mainImage.asset.url}
             alt={writingDetail.title}
             className="w-full h-64 object-cover rounded-lg mb-6 shadow-md"
             onError={(e) => {
               e.currentTarget.src = `https://placehold.co/600x400/cccccc/333333?text=Gambar+Gagal+Dimuat`;
               console.error(
                 "Failed to load image within modal:",
-                writingDetail.mainImage.asset._ref
+                writingDetail.mainImage.asset.url
               );
             }}
           />
