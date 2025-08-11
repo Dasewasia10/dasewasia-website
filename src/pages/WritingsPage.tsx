@@ -84,7 +84,7 @@ const WritingsPage: React.FC = () => {
             title,
             excerpt,
             publishedAt,
-            "slug": slug.current,
+            slug,
             mainImage{
                 asset->{
                     _id,

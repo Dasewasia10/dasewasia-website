@@ -15,7 +15,9 @@ interface WritingDetail {
     };
   };
   publishedAt: string;
-  slug: string;
+  slug: {
+    current: string;
+  };
 }
 
 interface WritingModalProps {
@@ -50,7 +52,7 @@ const WritingModal: React.FC<WritingModalProps> = ({
       }
 
       try {
-        const query = `*[_type == "writing" && slug == $writingSlug][0]{
+        const query = `*[_type == "writing" && slug.current == $writingSlug][0]{
           _id,
           title,
           body,
