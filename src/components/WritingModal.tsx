@@ -223,12 +223,25 @@ const WritingModal: React.FC<WritingModalProps> = ({
           />
         )}
         {/* Isi Tulisan - Menggunakan dangerouslySetInnerHTML untuk HTML yang kaya */}
-        <div
+        {/* <div
           className="prose dark:prose-invert max-w-none text-gray-800 dark:text-gray-200 leading-relaxed"
           dangerouslySetInnerHTML={{ __html: writingDetail.body }}
-        />
-        <div className="prose dark:prose-invert max-w-none">
-          <PortableText value={writingDetail.body} components={{}} />
+        /> */}
+        <div className="prose dark:prose-invert max-w-none text-gray-800 dark:text-gray-200 leading-relaxed">
+          <PortableText
+            value={writingDetail.body}
+            // Tambahkan komponen kustom di sini jika kamu ingin mengubah cara rendering
+            // misalnya untuk block code, video, atau audio.
+            components={{
+              // Ini hanya contoh, sesuaikan dengan kebutuhanmu
+              block: {
+                h1: ({ children }) => (
+                  <h1 className="text-4xl my-4">{children}</h1>
+                ),
+                normal: ({ children }) => <p className="my-2">{children}</p>,
+              },
+            }}
+          />
         </div>
       </div>
     </div>
