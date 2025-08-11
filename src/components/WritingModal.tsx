@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from "react";
 import sanityClient from "../sanityClient";
 import { PortableText } from "@portabletext/react";
+import { urlFor } from "../imageUrl";
 import { format } from "date-fns";
 
 interface WritingDetail {
@@ -191,7 +192,7 @@ const WritingModal: React.FC<WritingModalProps> = ({
                 // Tambahkan custom component untuk gambar dan file jika perlu
                 image: ({ value }) => (
                   <img
-                    src={value.asset.url}
+                    src={urlFor(value).url()}
                     alt={value.alt || "Gambar dari tulisan"}
                     className="my-6 mx-auto w-full max-w-lg rounded-lg shadow-md"
                   />
@@ -218,9 +219,7 @@ const WritingModal: React.FC<WritingModalProps> = ({
                       value={value.dialogue}
                       components={{
                         block: {
-                          normal: ({ children }) => (
-                            <p>{children}</p>
-                          ),
+                          normal: ({ children }) => <p>{children}</p>,
                         },
                       }}
                     />
