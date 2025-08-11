@@ -21,7 +21,10 @@ interface Writing {
       url: string;
     };
   };
-  slug: string;
+  slug: {
+    // <-- Kembalikan slug ke tipe objek
+    current: string;
+  };
 }
 
 // const API_BASE_URL = "https://dasewasia.my.id/api/";
@@ -145,7 +148,7 @@ const WritingsPage: React.FC = () => {
             <div
               key={writing._id}
               className="bg-white dark:bg-gray-800 rounded-lg shadow-xl p-6 transform transition duration-300 hover:scale-105 hover:shadow-2xl cursor-pointer"
-              onClick={() => openWritingModal(writing.slug)} // Ketika kartu diklik, buka modal
+              onClick={() => openWritingModal(writing.slug.current)} // Ketika kartu diklik, buka modal
             >
               {/* Tampilkan gambar jika ada */}
               {writing.mainImage.asset.url && (
