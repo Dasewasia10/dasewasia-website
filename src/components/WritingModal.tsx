@@ -101,7 +101,7 @@ const WritingModal: React.FC<WritingModalProps> = ({
       setWritingDetail(null);
 
       try {
-        const query = `*[_type == "writing" && slug.current == $writingSlug][0]{
+        const query = `*[_type == "writing" && slug == $writingSlug][0]{
           _id,
           title,
           body,
