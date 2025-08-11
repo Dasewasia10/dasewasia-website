@@ -28,13 +28,13 @@ interface Writing {
 // const API_BASE_URL = "https://dasewasia.my.id/api/";
 
 const WritingsPage: React.FC = () => {
-  const [writings, setWritings] = useState<Writing[]>([]);
+  const [writings, setWritings] = useState<any[]>([]); // Ganti Writing[] dengan any[] dulu untuk debug
   const [loadingList, setLoadingList] = useState<boolean>(true);
   const [errorList, setErrorList] = useState<string | null>(null);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
-  const [selectedWritingId, setSelectedWritingId] = useState<string | null>(
+  const [selectedWritingSlug, setSelectedWritingSlug] = useState<string | null>(
     null
-  );
+  ); // State baru untuk slug
 
   // useEffect hook untuk mengambil daftar tulisan saat komponen pertama kali di-mount
   // useEffect(() => {
@@ -107,14 +107,14 @@ const WritingsPage: React.FC = () => {
     fetchWritingsList();
   }, []);
 
-  const openWritingModal = (id: string) => {
-    setSelectedWritingId(id);
+  const openWritingModal = (slug: string) => {
+    setSelectedWritingSlug(slug);
     setIsModalOpen(true);
   };
 
   const closeWritingModal = () => {
     setIsModalOpen(false);
-    setSelectedWritingId(null); // Reset ID saat modal ditutup
+    setSelectedWritingSlug(null); // Reset slug saat modal ditutup
   };
 
   return (
@@ -177,9 +177,15 @@ const WritingsPage: React.FC = () => {
       )}
 
       {/* Render modal jika isModalOpen true dan ada selectedWritingId */}
-      {isModalOpen && selectedWritingId !== null && (
+      {/* {isModalOpen && selectedWritingId !== null && (
         <WritingModal
           writingSlug={selectedWritingId}
+          onClose={closeWritingModal}
+        />
+      )} */}
+      {isModalOpen && selectedWritingSlug !== null && (
+        <WritingModal
+          writingSlug={selectedWritingSlug}
           onClose={closeWritingModal}
         />
       )}
