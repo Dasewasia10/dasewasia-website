@@ -153,7 +153,7 @@ const WritingModal: React.FC<WritingModalProps> = ({
           {writingDetail.title}
         </h2>
         <p className="text-sm text-gray-500 dark:text-gray-400 mb-6">
-          Tanggal: {format(new Date(writingDetail.publishedAt), 'HH:mm, dd/MM/yyyy')}
+          {format(new Date(writingDetail.publishedAt), 'HH:mm, dd/MM/yyyy')}
         </p>
         {writingDetail.mainImage?.asset?.url && (
           <img
