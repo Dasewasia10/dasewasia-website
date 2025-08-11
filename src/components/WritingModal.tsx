@@ -151,11 +151,84 @@ const WritingModal: React.FC<WritingModalProps> = ({
           <PortableText
             value={writingDetail.body}
             components={{
+              // Konfigurasi untuk blok-blok standar (h1, h2, h3, dll.)
               block: {
                 h1: ({ children }) => (
-                  <h1 className="text-4xl my-4">{children}</h1>
+                  <h1 className="text-4xl my-4 font-bold">{children}</h1>
                 ),
-                normal: ({ children }) => <p className="my-2">{children}</p>,
+                h2: ({ children }) => (
+                  <h2 className="text-3xl my-3 font-semibold">{children}</h2>
+                ),
+                h3: ({ children }) => (
+                  <h3 className="text-2xl my-2 font-semibold">{children}</h3>
+                ),
+                normal: ({ children }) => (
+                  <p className="my-2 leading-relaxed">{children}</p>
+                ),
+                blockquote: ({ children }) => (
+                  <blockquote className="border-l-4 border-blue-500 dark:border-blue-400 pl-4 my-4 italic text-gray-600 dark:text-gray-300">
+                    {children}
+                  </blockquote>
+                ),
+              },
+              // Konfigurasi untuk tipe kustom (seperti pageBreak)
+              types: {
+                pageBreak: ({ value }) => {
+                  if (value.breakType === "doubleRule") {
+                    return (
+                      <hr className="my-8 border-t-2 border-gray-400 dark:border-gray-500" />
+                    );
+                  }
+                  return (
+                    <hr className="my-8 border-t border-gray-300 dark:border-gray-600" />
+                  );
+                },
+                // Tambahkan custom component untuk gambar dan file jika perlu
+                image: ({ value }) => (
+                  <img
+                    src={value.asset.url}
+                    alt={value.alt || "Gambar dari tulisan"}
+                    className="my-6 mx-auto w-full max-w-lg rounded-lg shadow-md"
+                  />
+                ),
+                file: ({ value }) => (
+                  <div className="my-4 p-4 border rounded-md bg-gray-100 dark:bg-gray-700">
+                    <p className="text-sm text-gray-600 dark:text-gray-400">
+                      Audio:
+                    </p>
+                    <audio controls className="w-full mt-2">
+                      <source src={value.asset.url} />
+                      Your browser does not support the audio element.
+                    </audio>
+                    {value.caption && (
+                      <p className="text-center text-xs mt-2 text-gray-500 dark:text-gray-400">
+                        {value.caption}
+                      </p>
+                    )}
+                  </div>
+                ),
+              },
+              // Konfigurasi untuk decorators (strong, em, code) dan annotations (link)
+              marks: {
+                link: ({ children, value }) => (
+                  <a
+                    href={value.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-blue-600 dark:text-blue-400 hover:underline"
+                  >
+                    {children}
+                  </a>
+                ),
+                strong: ({ children }) => (
+                  <strong className="font-bold">{children}</strong>
+                ),
+                em: ({ children }) => <em className="italic">{children}</em>,
+                code: ({ children }) => (
+                  <code className="bg-gray-200 dark:bg-gray-700 rounded-md px-1 py-0.5 text-red-600 dark:text-red-400">
+                    {children}
+                  </code>
+                ),
               },
             }}
           />
