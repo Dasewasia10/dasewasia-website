@@ -170,6 +170,11 @@ const WritingModal: React.FC<WritingModalProps> = ({
                     {children}
                   </blockquote>
                 ),
+                dialogue: ({ children }) => (
+                  <p className="my-4 text-xl italic leading-relaxed text-gray-700 dark:text-gray-300">
+                    &ldquo;{children}&rdquo;
+                  </p>
+                ),
               },
               // Konfigurasi untuk tipe kustom (seperti pageBreak)
               types: {
@@ -205,6 +210,20 @@ const WritingModal: React.FC<WritingModalProps> = ({
                         {value.caption}
                       </p>
                     )}
+                  </div>
+                ),
+                dialogueBlock: ({ value }) => (
+                  <div className="my-4 p-4 border-l-4 border-blue-500 italic text-xl leading-relaxed text-gray-700 dark:text-gray-300">
+                    <PortableText
+                      value={value.dialogue}
+                      components={{
+                        block: {
+                          normal: ({ children }) => (
+                            <p>&ldquo;{children}&rdquo;</p>
+                          ),
+                        },
+                      }}
+                    />
                   </div>
                 ),
               },
