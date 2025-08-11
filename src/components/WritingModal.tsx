@@ -172,7 +172,7 @@ const WritingModal: React.FC<WritingModalProps> = ({
                 ),
                 dialogue: ({ children }) => (
                   <p className="my-4 text-xl italic leading-relaxed text-gray-700 dark:text-gray-300">
-                    &ldquo;{children}&rdquo;
+                    {children}
                   </p>
                 ),
               },
@@ -219,7 +219,7 @@ const WritingModal: React.FC<WritingModalProps> = ({
                       components={{
                         block: {
                           normal: ({ children }) => (
-                            <p>&ldquo;{children}&rdquo;</p>
+                            <p>{children}</p>
                           ),
                         },
                       }}
