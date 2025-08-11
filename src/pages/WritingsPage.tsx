@@ -1,17 +1,10 @@
 import React, { useState, useEffect } from "react";
-import sanityClient from "../sanityClient"; // Import Sanity Client
-import WritingModal from "../components/WritingModal"; // Import komponen modal
-
-// interface Writing {
-//   id: number;
-//   title: string;
-//   excerpt: string;
-//   date: string;
-//   imageUrl?: string;
-// }
+import sanityClient from "../sanityClient"; 
+import WritingModal from "../components/WritingModal";
+import { format } from "date-fns";
 
 interface Writing {
-  _id: string; // Sanity menggunakan _id, bukan id
+  _id: string;
   title: string;
   excerpt: string;
   publishedAt: string;
@@ -22,12 +15,9 @@ interface Writing {
     };
   };
   slug: {
-    // <-- Kembalikan slug ke tipe objek
     current: string;
   };
 }
-
-// const API_BASE_URL = "https://dasewasia.my.id/api/";
 
 const WritingsPage: React.FC = () => {
   const [writings, setWritings] = useState<any[]>([]); // Ganti Writing[] dengan any[] dulu untuk debug
@@ -36,46 +26,9 @@ const WritingsPage: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [selectedWritingSlug, setSelectedWritingSlug] = useState<string | null>(
     null
-  ); // State baru untuk slug
+  );
 
   // useEffect hook untuk mengambil daftar tulisan saat komponen pertama kali di-mount
-  // useEffect(() => {
-  //   const fetchWritingsList = async () => {
-  //     setLoadingList(true); // Set loading menjadi true saat mulai fetch
-  //     setErrorList(null); // Reset error sebelumnya
-
-  //     try {
-  //       // Lakukan fetch ke endpoint API yang mengembalikan daftar tulisan
-  //       const response = await fetch(`${API_BASE_URL}writings`);
-
-  //       // Periksa apakah respons berhasil (status code 2xx)
-  //       if (!response.ok) {
-  //         // Jika respons tidak OK, ambil teks error dari body respons
-  //         const errorBody = await response.text();
-  //         console.error(
-  //           `Fetch failed with status ${response.status}: ${errorBody}`
-  //         );
-  //         throw new Error(
-  //           `HTTP error! status: ${response.status} - ${errorBody}`
-  //         );
-  //       }
-
-  //       // Parse respons JSON menjadi array objek Writing
-  //       const data: Writing[] = await response.json();
-  //       setWritings(data); // Simpan data tulisan ke state
-  //     } catch (err) {
-  //       // Tangani error jika fetch gagal
-  //       console.error("Gagal memuat daftar tulisan:", err);
-  //       setErrorList("Gagal memuat daftar tulisan. Silakan coba lagi.");
-  //     } finally {
-  //       // Set loading menjadi false setelah fetch selesai (baik berhasil maupun gagal)
-  //       setLoadingList(false);
-  //     }
-  //   };
-
-  //   fetchWritingsList(); // Panggil fungsi fetch saat komponen di-mount
-  // }, []); // Array dependensi kosong berarti efek ini hanya berjalan sekali (saat mount)
-
   useEffect(() => {
     const fetchWritingsList = async () => {
       setLoadingList(true);
@@ -172,20 +125,13 @@ const WritingsPage: React.FC = () => {
               </p>
               {/* Tanggal tulisan */}
               <p className="text-gray-500 dark:text-gray-400 text-xs mb-4">
-                {writing.publishedAt}
+                {format(new Date(writing.publishedAt), 'HH:mm, dd/MM/yyyy')}
               </p>
             </div>
           ))}
         </div>
       )}
-
-      {/* Render modal jika isModalOpen true dan ada selectedWritingId */}
-      {/* {isModalOpen && selectedWritingId !== null && (
-        <WritingModal
-          writingSlug={selectedWritingId}
-          onClose={closeWritingModal}
-        />
-      )} */}
+      {/* Render modal jika isModalOpen true dan slug tidak null */}
       {isModalOpen && selectedWritingSlug !== null && (
         <WritingModal
           writingSlug={selectedWritingSlug}

@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from "react";
 import sanityClient from "../sanityClient";
 import { PortableText } from "@portabletext/react";
+import { format } from "date-fns";
 
 interface WritingDetail {
   _id: string;
@@ -152,7 +153,7 @@ const WritingModal: React.FC<WritingModalProps> = ({
           {writingDetail.title}
         </h2>
         <p className="text-sm text-gray-500 dark:text-gray-400 mb-6">
-          Tanggal: {writingDetail.publishedAt}
+          Tanggal: {format(new Date(writingDetail.publishedAt), 'HH:mm, dd/MM/yyyy')}
         </p>
         {writingDetail.mainImage?.asset?.url && (
           <img
