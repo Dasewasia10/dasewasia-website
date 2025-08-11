@@ -63,7 +63,6 @@ const WritingsPage: React.FC = () => {
   }, []);
 
   const openWritingModal = (slug: string) => {
-    console.log("Attempting to open modal with slug:", slug);
     setSelectedWritingSlug(slug);
     setIsModalOpen(true);
   };

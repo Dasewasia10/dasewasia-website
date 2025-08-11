@@ -37,8 +37,6 @@ const WritingModal: React.FC<WritingModalProps> = ({
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    console.log("WritingModal useEffect triggered. Slug:", writingSlug);
-
     const fetchWritingDetail = async () => {
       setLoading(true);
       setError(null);
@@ -67,11 +65,8 @@ const WritingModal: React.FC<WritingModalProps> = ({
         }`;
 
         const params = { writingSlug };
-        console.log("Fetching with query:", query, "and params:", params);
 
         const data: WritingDetail = await sanityClient.fetch(query, params);
-
-        console.log("Data fetched from Sanity:", data);
 
         if (data) {
           setWritingDetail(data);
@@ -84,24 +79,13 @@ const WritingModal: React.FC<WritingModalProps> = ({
         setError("Gagal memuat konten tulisan. Silakan coba lagi.");
       } finally {
         setLoading(false);
-        console.log("WritingModal fetch finished. Loading:", false);
       }
     };
 
     fetchWritingDetail();
   }, [writingSlug]);
 
-  console.log(
-    "WritingModal render: loading=",
-    loading,
-    "error=",
-    error,
-    "writingDetail=",
-    writingDetail ? writingDetail.title : "null"
-  );
-
   if (loading) {
-    console.log("WritingModal: Rendering loading state");
     return (
       <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 p-4">
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-2xl p-8 max-w-2xl w-full text-center">
@@ -114,7 +98,6 @@ const WritingModal: React.FC<WritingModalProps> = ({
   }
 
   if (error) {
-    console.log("WritingModal: Rendering error state");
     return (
       <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 p-4">
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-2xl p-8 max-w-2xl w-full text-center">
@@ -131,14 +114,9 @@ const WritingModal: React.FC<WritingModalProps> = ({
   }
 
   if (!writingDetail) {
-    console.log("WritingModal: writingDetail is null. Returning null.");
     return null;
   }
 
-  console.log(
-    "WritingModal: Rendering actual modal content for",
-    writingDetail.title
-  );
   return (
     <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 p-4">
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow-2xl p-6 md:p-8 max-w-3xl w-full relative transform transition-all duration-300 scale-95 animate-modal-in max-h-[90vh] overflow-y-auto">
@@ -153,7 +131,7 @@ const WritingModal: React.FC<WritingModalProps> = ({
           {writingDetail.title}
         </h2>
         <p className="text-sm text-gray-500 dark:text-gray-400 mb-6">
-          {format(new Date(writingDetail.publishedAt), 'HH:mm, dd/MM/yyyy')}
+          {format(new Date(writingDetail.publishedAt), "HH:mm, dd/MM/yyyy")}
         </p>
         {writingDetail.mainImage?.asset?.url && (
           <img
