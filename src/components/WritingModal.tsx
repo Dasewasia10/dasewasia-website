@@ -96,38 +96,45 @@ const WritingModal: React.FC<WritingModalProps> = ({
 
   useEffect(() => {
     const fetchWritingDetail = async () => {
-      // ... (loading state)
+      setLoading(true);
+      setError(null);
+      setWritingDetail(null);
+
       try {
-        // Query berdasarkan slug untuk mendapatkan detail tulisan
         const query = `*[_type == "writing" && slug.current == $writingSlug][0]{
-                    _id,
-                    title,
-                    body,
-                    publishedAt,
-                    mainImage{
-                        asset->{
-                            _id,
-                            url
-                        }
-                    },
-                    "fullContent": body // Sanity Portable Text
-                }`;
+          _id,
+          title,
+          body,
+          publishedAt,
+          mainImage{
+            asset->{
+              _id,
+              url
+            }
+          },
+          "fullContent": body
+        }`;
+
+        // Pastikan params-nya benar
         const params = { writingSlug };
-        const data: WritingDetail = await sanityClient.fetch(query, params);
-        setWritingDetail(data);
+
+        const data = await sanityClient.fetch(query, params);
+
+        // Log data yang diterima untuk debugging
+        console.log("Data fetched from Sanity:", data);
+
+        if (data) {
+          setWritingDetail(data);
+        } else {
+          // Jika data null/kosong, berarti tidak ada tulisan dengan slug tersebut
+          setError("Tulisan tidak ditemukan.");
+        }
       } catch (err) {
         console.error("Gagal memuat detail tulisan:", err);
         setError("Gagal memuat konten tulisan. Silakan coba lagi.");
       } finally {
         setLoading(false);
-        // Log status akhir setelah fetch selesai
-        // Perhatikan: 'error' di sini mungkin masih nilai dari closure sebelumnya jika error baru saja di-set
-        console.log(
-          "WritingModal fetch finished. Loading:",
-          false,
-          "Error state after fetch:",
-          error
-        );
+        console.log("WritingModal fetch finished.");
       }
     };
 
