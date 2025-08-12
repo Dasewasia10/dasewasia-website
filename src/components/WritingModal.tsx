@@ -63,7 +63,20 @@ const WritingModal: React.FC<WritingModalProps> = ({
         const query = `*[_type == "writing" && slug.current == $writingSlug][0]{
           _id,
           title,
-          body,
+          body[]{
+            ...,
+            markDefs[]{
+              ...,
+              _type == "glossaryTerm" => {
+                // Ikuti referensi dan ambil data yang dibutuhkan
+                "termRef": termRef->{
+                  term,
+                  definition,
+                  slug
+                }
+              }
+            }
+          },
           publishedAt,
           mainImage{
             asset->{
@@ -257,7 +270,8 @@ const WritingModal: React.FC<WritingModalProps> = ({
                 ),
                 glossaryTerm: ({ children, value }) => {
                   const term = value.termRef;
-                  if (!term) return children; // Jika referensi rusak, kembalikan teks biasa
+                  if (!term || !term.slug || !term.slug.current)
+                    return children; // Tambahkan pengecekan yang lebih kuat
                   return (
                     <a
                       href={`#${term.slug.current}`}
