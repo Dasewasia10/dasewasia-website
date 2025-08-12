@@ -1,6 +1,8 @@
 // src/components/WritingModal.tsx
 
 import React, { useEffect, useState, useRef } from "react";
+import StyledText from "./StyledText";
+
 import sanityClient from "../sanityClient";
 import { PortableText } from "@portabletext/react";
 import { urlFor } from "../imageUrl";
@@ -226,7 +228,9 @@ const WritingModal: React.FC<WritingModalProps> = ({
                 ),
                 // Tambahkan class mb-4 di paragraf untuk spasi bawah
                 normal: ({ children }) => (
-                  <p className="my-2 leading-relaxed mb-4">{children}</p>
+                  <p className="my-2 leading-relaxed mb-4">
+                    <StyledText>{children}</StyledText>
+                  </p>
                 ),
                 blockquote: ({ children }) => (
                   <blockquote className="border-l-4 border-blue-500 dark:border-blue-400 pl-4 my-4 italic text-gray-600 dark:text-gray-300">
