@@ -57,19 +57,28 @@ const WritingModal: React.FC<WritingModalProps> = ({
 
   let hoverTimer: ReturnType<typeof setTimeout> | null = null;
 
-  // Fungsi untuk menampilkan tooltip
+  // Fungsi untuk menampilkan tooltip, sekarang dengan posisi yang lebih akurat
   const showTooltip = (
     term: string,
     definition: string,
     e: React.MouseEvent
   ) => {
-    // Tunda tampilan tooltip selama 500ms (0.5 detik)
+    // Bersihkan timer lama jika ada
+    if (hoverTimer) {
+      clearTimeout(hoverTimer);
+    }
+
+    // Dapatkan posisi elemen yang di-hover
+    const target = e.currentTarget as HTMLElement;
+    const rect = target.getBoundingClientRect();
+
+    // Set posisi tooltip di bawah elemen yang di-hover
     hoverTimer = setTimeout(() => {
       setTooltipState({
         isVisible: true,
         term,
         definition,
-        position: { x: e.clientX + 10, y: e.clientY + 10 },
+        position: { x: rect.left, y: rect.bottom + window.scrollY + 10 },
       });
     }, 500);
   };
