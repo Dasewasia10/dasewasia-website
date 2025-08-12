@@ -308,11 +308,11 @@ const WritingModal: React.FC<WritingModalProps> = ({
                     >
                       {children}
                       {isTooltipActive && (
-                        <div className="absolute top-full left-0 mt-2 z-50 p-4 w-64 bg-gray-900 text-white rounded-lg shadow-2xl transition-opacity duration-300">
+                        <div className="absolute top-full left-0 mt-2 z-50 p-4 w-64 lg:w-80 bg-gray-900 text-white rounded-lg shadow-2xl transition-opacity duration-300">
                           <h4 className="font-bold text-lg mb-1">
                             {term.term}
                           </h4>
-                          <p className="text-sm">{term.definition}</p>
+                          <p className="text-sm text-left">{term.definition}</p>
                         </div>
                       )}
                     </span>
