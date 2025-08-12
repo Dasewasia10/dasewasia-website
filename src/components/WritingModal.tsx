@@ -1,6 +1,6 @@
 // src/components/WritingModal.tsx
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import sanityClient from "../sanityClient";
 import { PortableText } from "@portabletext/react";
 import { urlFor } from "../imageUrl";
@@ -42,53 +42,26 @@ const WritingModal: React.FC<WritingModalProps> = ({
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
-  // State baru untuk mengelola tooltip
-  const [tooltipState, setTooltipState] = useState<{
-    isVisible: boolean;
-    term: string;
-    definition: string;
-    position: { x: number; y: number };
-  }>({
-    isVisible: false,
-    term: "",
-    definition: "",
-    position: { x: 0, y: 0 },
-  });
+  // State baru untuk mengelola tooltip yang aktif
+  const [activeTooltip, setActiveTooltip] = useState<string | null>(null);
+  const hoverTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  let hoverTimer: ReturnType<typeof setTimeout> | null = null;
-
-  // Fungsi untuk menampilkan tooltip, sekarang dengan posisi yang lebih akurat
-  const showTooltip = (
-    term: string,
-    definition: string,
-    e: React.MouseEvent
-  ) => {
-    // Bersihkan timer lama jika ada
-    if (hoverTimer) {
-      clearTimeout(hoverTimer);
+  // Fungsi untuk menampilkan tooltip
+  const showTooltip = (termSlug: string) => {
+    if (hoverTimer.current) {
+      clearTimeout(hoverTimer.current);
     }
-
-    // Dapatkan posisi elemen yang di-hover
-    const target = e.currentTarget as HTMLElement;
-    const rect = target.getBoundingClientRect();
-
-    // Set posisi tooltip di bawah elemen yang di-hover
-    hoverTimer = setTimeout(() => {
-      setTooltipState({
-        isVisible: true,
-        term,
-        definition,
-        position: { x: rect.left, y: rect.bottom + window.scrollY + 10 },
-      });
+    hoverTimer.current = setTimeout(() => {
+      setActiveTooltip(termSlug);
     }, 500);
   };
 
   // Fungsi untuk menyembunyikan tooltip
   const hideTooltip = () => {
-    if (hoverTimer) {
-      clearTimeout(hoverTimer);
+    if (hoverTimer.current) {
+      clearTimeout(hoverTimer.current);
     }
-    setTooltipState({ ...tooltipState, isVisible: false });
+    setActiveTooltip(null);
   };
 
   useEffect(() => {
@@ -316,16 +289,32 @@ const WritingModal: React.FC<WritingModalProps> = ({
                 glossaryTerm: ({ children, value }) => {
                   const term = value.termRef;
                   if (!term) return children;
+
+                  const isTooltipActive = activeTooltip === term.slug.current;
+
                   return (
                     <span
-                      className="font-semibold underline cursor-pointer hover:text-blue-500"
-                      onMouseEnter={(e) =>
-                        showTooltip(term.term, term.definition, e)
-                      }
+                      className="font-semibold underline cursor-pointer hover:text-blue-500 relative"
+                      onMouseEnter={() => showTooltip(term.slug.current)}
                       onMouseLeave={hideTooltip}
-                      onClick={hideTooltip}
+                      onClick={() => {
+                        // Jika sudah diklik, hilangkan. Jika belum, tampilkan.
+                        if (isTooltipActive) {
+                          hideTooltip();
+                        } else {
+                          setActiveTooltip(term.slug.current);
+                        }
+                      }}
                     >
                       {children}
+                      {isTooltipActive && (
+                        <div className="absolute top-full left-0 mt-2 z-50 p-4 w-64 bg-gray-900 text-white rounded-lg shadow-2xl transition-opacity duration-300">
+                          <h4 className="font-bold text-lg mb-1">
+                            {term.term}
+                          </h4>
+                          <p className="text-sm">{term.definition}</p>
+                        </div>
+                      )}
                     </span>
                   );
                 },
@@ -333,20 +322,6 @@ const WritingModal: React.FC<WritingModalProps> = ({
             }}
           />
         </div>
-
-        {/* Tooltip glosarium */}
-        {tooltipState.isVisible && (
-          <div
-            className="fixed p-4 bg-gray-900 text-white rounded-lg shadow-2xl z-50 transition-opacity duration-300 pointer-events-none"
-            style={{
-              top: tooltipState.position.y,
-              left: tooltipState.position.x,
-            }}
-          >
-            <h4 className="font-bold text-lg mb-1">{tooltipState.term}</h4>
-            <p className="text-sm">{tooltipState.definition}</p>
-          </div>
-        )}
       </div>
     </div>
   );
