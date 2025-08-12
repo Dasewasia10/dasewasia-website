@@ -6,99 +6,71 @@ interface StyledTextProps {
 }
 
 const StyledText: React.FC<StyledTextProps> = ({ children }) => {
-  // Pastikan children adalah string sebelum memprosesnya
-  const text = typeof children === "string" ? children : "";
+  const processText = (text: string) => {
+    // Regex untuk mendeteksi teks di dalam tanda kutip ganda
+    const quoteRegex = /"([^"]*)"/g;
+    // Regex untuk mendeteksi teks di dalam kurung siku
+    const bracketRegex = /\[(.*?)\]/g;
 
-  // Jika children bukan string, atau string kosong, kembalikan langsung
-  if (!text) {
-    return <>{children}</>;
-  }
+    let parts: (string | React.ReactNode)[] = [text];
 
-  // Regex untuk mendeteksi teks di dalam tanda kutip ganda
-  const quoteRegex = /"([^"]*)"/g;
-  // Regex untuk mendeteksi teks di dalam kurung siku
-  const bracketRegex = /\[(.*?)\]/g;
-
-  // Lakukan proses untuk kurung siku terlebih dahulu
-  let partsWithBrackets: React.ReactNode[] = [text];
-
-  partsWithBrackets = partsWithBrackets.flatMap((part) => {
-    if (typeof part === "string") {
+    // Proses untuk kurung siku
+    parts = parts.flatMap((part) => {
+      if (typeof part !== "string") return part;
       const matches = [...part.matchAll(bracketRegex)];
-      if (matches.length === 0) {
-        return [part];
-      }
+      if (matches.length === 0) return part;
 
-      const result: React.ReactNode[] = [];
+      const result: (string | React.ReactNode)[] = [];
       let lastIndex = 0;
       matches.forEach((match) => {
-        const textBefore = part.substring(lastIndex, match.index);
-        const bracketedText = match[1];
-
-        if (textBefore) {
-          result.push(textBefore);
-        }
-
+        result.push(part.substring(lastIndex, match.index));
         result.push(
           <strong
             key={`bracket-${match.index}`}
             className="uppercase text-red-500"
           >
-            {bracketedText}
+            {match[1]}
           </strong>
         );
-
         lastIndex = match.index + match[0].length;
       });
+      result.push(part.substring(lastIndex));
+      return result.filter(Boolean);
+    });
 
-      const textAfter = part.substring(lastIndex);
-      if (textAfter) {
-        result.push(textAfter);
-      }
-
-      return result;
-    }
-    return [part];
-  });
-
-  // Setelah itu, lakukan proses untuk tanda kutip
-  const finalParts = partsWithBrackets.flatMap((part) => {
-    if (typeof part === "string") {
+    // Proses untuk tanda kutip
+    const finalParts = parts.flatMap((part) => {
+      if (typeof part !== "string") return part;
       const matches = [...part.matchAll(quoteRegex)];
-      if (matches.length === 0) {
-        return [part];
-      }
+      if (matches.length === 0) return part;
 
-      const result: React.ReactNode[] = [];
+      const result: (string | React.ReactNode)[] = [];
       let lastIndex = 0;
       matches.forEach((match) => {
-        const textBefore = part.substring(lastIndex, match.index);
-        const quotedText = match[1];
-
-        if (textBefore) {
-          result.push(textBefore);
-        }
-
+        result.push(part.substring(lastIndex, match.index));
         result.push(
           <span key={`quote-${match.index}`} className="italic text-blue-500">
-            "{quotedText}"
+            "{match[1]}"
           </span>
         );
-
         lastIndex = match.index + match[0].length;
       });
+      result.push(part.substring(lastIndex));
+      return result.filter(Boolean);
+    });
 
-      const textAfter = part.substring(lastIndex);
-      if (textAfter) {
-        result.push(textAfter);
-      }
+    return finalParts;
+  };
 
-      return result;
+  // Gunakan fungsi untuk memproses children
+  const renderedChildren = React.Children.map(children, (child) => {
+    if (typeof child === "string") {
+      return processText(child);
     }
-    return [part];
+    return child;
   });
 
-  return <>{finalParts}</>;
+  return <>{renderedChildren}</>;
 };
 
 export default StyledText;
