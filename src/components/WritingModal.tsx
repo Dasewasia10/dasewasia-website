@@ -41,9 +41,46 @@ const WritingModal: React.FC<WritingModalProps> = ({
   );
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
-  const [activeGlossarySlug, setActiveGlossarySlug] = useState<string | null>(
-    null
-  ); // State baru
+
+  // State baru untuk mengelola tooltip
+  const [tooltipState, setTooltipState] = useState<{
+    isVisible: boolean;
+    term: string;
+    definition: string;
+    position: { x: number; y: number };
+  }>({
+    isVisible: false,
+    term: "",
+    definition: "",
+    position: { x: 0, y: 0 },
+  });
+
+  let hoverTimer: ReturnType<typeof setTimeout> | null = null;
+
+  // Fungsi untuk menampilkan tooltip
+  const showTooltip = (
+    term: string,
+    definition: string,
+    e: React.MouseEvent
+  ) => {
+    // Tunda tampilan tooltip selama 500ms (0.5 detik)
+    hoverTimer = setTimeout(() => {
+      setTooltipState({
+        isVisible: true,
+        term,
+        definition,
+        position: { x: e.clientX + 10, y: e.clientY + 10 },
+      });
+    }, 500);
+  };
+
+  // Fungsi untuk menyembunyikan tooltip
+  const hideTooltip = () => {
+    if (hoverTimer) {
+      clearTimeout(hoverTimer);
+    }
+    setTooltipState({ ...tooltipState, isVisible: false });
+  };
 
   useEffect(() => {
     const fetchWritingDetail = async () => {
@@ -84,7 +121,6 @@ const WritingModal: React.FC<WritingModalProps> = ({
               url
             }
           },
-          glossary[]{ slug, term, definition }
         }`;
 
         const params = { writingSlug };
@@ -270,52 +306,36 @@ const WritingModal: React.FC<WritingModalProps> = ({
                 ),
                 glossaryTerm: ({ children, value }) => {
                   const term = value.termRef;
-                  if (!term || !term.slug || !term.slug.current)
-                    return children; // Tambahkan pengecekan yang lebih kuat
+                  if (!term) return children;
                   return (
-                    <a
-                      href={`#${term.slug.current}`}
-                      onClick={(e) => {
-                        e.preventDefault();
-                        setActiveGlossarySlug(term.slug.current);
-                        const glossaryItem = document.getElementById(
-                          term.slug.current
-                        );
-                        if (glossaryItem)
-                          glossaryItem.scrollIntoView({ behavior: "smooth" });
-                      }}
+                    <span
                       className="font-semibold underline cursor-pointer hover:text-blue-500"
+                      onMouseEnter={(e) =>
+                        showTooltip(term.term, term.definition, e)
+                      }
+                      onMouseLeave={hideTooltip}
+                      onClick={hideTooltip}
                     >
                       {children}
-                    </a>
+                    </span>
                   );
                 },
               },
             }}
           />
         </div>
-        {/* Bagian Glosarium */}
-        {writingDetail.glossary && writingDetail.glossary.length > 0 && (
-          <div className="mt-8 border-t border-gray-300 dark:border-gray-600 pt-4">
-            <h3 className="text-2xl font-bold mb-4">Glosarium</h3>
-            <ul className="space-y-4">
-              {writingDetail.glossary.map((item) => (
-                <li
-                  key={item.slug.current}
-                  id={item.slug.current}
-                  className={`p-2 rounded-md transition-colors duration-200 ${
-                    activeGlossarySlug === item.slug.current
-                      ? "bg-blue-100 dark:bg-blue-900"
-                      : ""
-                  }`}
-                >
-                  <p className="font-semibold text-lg">{item.term}</p>
-                  <p className="text-gray-600 dark:text-gray-400">
-                    {item.definition}
-                  </p>
-                </li>
-              ))}
-            </ul>
+
+        {/* Tooltip glosarium */}
+        {tooltipState.isVisible && (
+          <div
+            className="fixed p-4 bg-gray-900 text-white rounded-lg shadow-2xl z-50 transition-opacity duration-300 pointer-events-none"
+            style={{
+              top: tooltipState.position.y,
+              left: tooltipState.position.x,
+            }}
+          >
+            <h4 className="font-bold text-lg mb-1">{tooltipState.term}</h4>
+            <p className="text-sm">{tooltipState.definition}</p>
           </div>
         )}
       </div>
