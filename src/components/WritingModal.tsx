@@ -20,6 +20,11 @@ interface WritingDetail {
   slug: {
     current: string;
   };
+  glossary?: {
+    term: string;
+    definition: string;
+    slug: { current: string }; // Tambahkan slug di interface
+  }[];
 }
 
 interface WritingModalProps {
@@ -36,6 +41,9 @@ const WritingModal: React.FC<WritingModalProps> = ({
   );
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+  const [activeGlossarySlug, setActiveGlossarySlug] = useState<string | null>(
+    null
+  ); // State baru
 
   useEffect(() => {
     const fetchWritingDetail = async () => {
@@ -62,11 +70,11 @@ const WritingModal: React.FC<WritingModalProps> = ({
               _id,
               url
             }
-          }
+          },
+          glossary[]{ slug, term, definition }
         }`;
 
         const params = { writingSlug };
-
         const data: WritingDetail = await sanityClient.fetch(query, params);
 
         if (data) {
@@ -172,7 +180,7 @@ const WritingModal: React.FC<WritingModalProps> = ({
                   </blockquote>
                 ),
                 dialogue: ({ children }) => (
-                  <p className="my-4 text-xl italic leading-relaxed text-gray-700 dark:text-gray-300">
+                  <p className="my-4 italic leading-relaxed text-gray-700 dark:text-gray-300">
                     {children}
                   </p>
                 ),
@@ -247,10 +255,55 @@ const WritingModal: React.FC<WritingModalProps> = ({
                     {children}
                   </code>
                 ),
+                glossaryTerm: ({ children, value }) => {
+                  const term = value.termRef;
+                  if (!term) return children; // Jika referensi rusak, kembalikan teks biasa
+                  return (
+                    <a
+                      href={`#${term.slug.current}`}
+                      onClick={(e) => {
+                        e.preventDefault();
+                        setActiveGlossarySlug(term.slug.current);
+                        const glossaryItem = document.getElementById(
+                          term.slug.current
+                        );
+                        if (glossaryItem)
+                          glossaryItem.scrollIntoView({ behavior: "smooth" });
+                      }}
+                      className="font-semibold underline cursor-pointer hover:text-blue-500"
+                    >
+                      {children}
+                    </a>
+                  );
+                },
               },
             }}
           />
         </div>
+        {/* Bagian Glosarium */}
+        {writingDetail.glossary && writingDetail.glossary.length > 0 && (
+          <div className="mt-8 border-t border-gray-300 dark:border-gray-600 pt-4">
+            <h3 className="text-2xl font-bold mb-4">Glosarium</h3>
+            <ul className="space-y-4">
+              {writingDetail.glossary.map((item) => (
+                <li
+                  key={item.slug.current}
+                  id={item.slug.current}
+                  className={`p-2 rounded-md transition-colors duration-200 ${
+                    activeGlossarySlug === item.slug.current
+                      ? "bg-blue-100 dark:bg-blue-900"
+                      : ""
+                  }`}
+                >
+                  <p className="font-semibold text-lg">{item.term}</p>
+                  <p className="text-gray-600 dark:text-gray-400">
+                    {item.definition}
+                  </p>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
       </div>
     </div>
   );
