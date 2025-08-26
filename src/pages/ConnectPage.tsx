@@ -36,18 +36,20 @@ const ConnectPage: React.FC = () => {
         }),
       });
 
-      const data = await response.json();
-
+      // Periksa apakah respons berhasil (status 200-299)
       if (response.ok) {
+        const data = await response.json();
         setStatus("success");
         setResponseMessage(
           data.message || "Pesan anonim Anda berhasil dikirim!"
         );
         setMessage(""); // Bersihkan textarea setelah berhasil
       } else {
+        // Tangani respons non-OK, misalnya status 400 atau 500
+        const errorData = await response.json();
         setStatus("error");
         setResponseMessage(
-          data.message || "Gagal mengirim pesan. Silakan coba lagi."
+          errorData.message || "Gagal mengirim pesan. Silakan coba lagi."
         );
       }
     } catch (error) {

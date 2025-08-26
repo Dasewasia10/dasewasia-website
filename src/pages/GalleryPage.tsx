@@ -2,10 +2,7 @@ import React, { useState, useEffect, useCallback, useRef } from "react";
 import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/24/solid";
 
 // URL untuk endpoint API yang mengembalikan JSON daftar gambar
-const API_BASE_URL = "https://dasewasia.my.id/api/img/drawing";
-
-// URL untuk direktori gambar yang sebenarnya, sesuai dengan permintaan
-const MATERIAL_IMAGE_URL = "https://material.dasewasia.my.id/img/drawing";
+const API_MANIFEST_URL = "https://dasewasia.my.id/api/img/drawing";
 
 // Tipe data untuk respons dari API
 interface ImageManifest {
@@ -23,10 +20,13 @@ const GalleryPage: React.FC = () => {
   const [mainImageLoaded, setMainImageLoaded] = useState<boolean>(false);
   const [categories, setCategories] = useState<string[]>([]);
 
+  // Ref untuk menyimpan manifest gambar yang dimuat sekali
+  const manifestRef = useRef<ImageManifest>({});
+
   // Ref untuk menyimpan daftar gambar yang sudah di-pre-load
   const preloadedImagesRef = useRef<Record<string, HTMLImageElement>>({});
 
-  // Fungsi untuk memuat gambar
+  // Fungsi untuk memuat gambar ke cache browser
   const preloadImage = (url: string) => {
     if (!preloadedImagesRef.current[url]) {
       const img = new Image();
@@ -39,28 +39,32 @@ const GalleryPage: React.FC = () => {
   const getImageUrl = useCallback(
     (category: string, imageName: string): string => {
       // Menggabungkan base URL gambar dengan nama kategori dan nama file, lalu menambahkan ekstensi .png
-      return `${MATERIAL_IMAGE_URL}/${category}/${imageName}.png`;
+      return `${API_MANIFEST_URL}/${category}/${imageName}`;
     },
     []
   );
 
-  // Efek untuk mengambil daftar gambar dari API
+  // Efek untuk mengambil daftar kategori dan gambar dari API (hanya sekali saat mount)
   useEffect(() => {
     const fetchImageManifest = async () => {
       setLoading(true);
       setError(null);
       try {
-        const response = await fetch(API_BASE_URL);
+        const response = await fetch(API_MANIFEST_URL);
         if (!response.ok) {
           throw new Error("Failed to fetch image manifest.");
         }
         const manifest: ImageManifest = await response.json();
+
+        manifestRef.current = manifest; // Simpan manifest di ref
         const allCategories = Object.keys(manifest);
         setCategories(allCategories);
 
+        // Atur kategori default
         const defaultCategory = allCategories.includes("fanart")
           ? "fanart"
           : allCategories[0];
+        setImagesInCurrentCategory(manifest[defaultCategory] || []);
         setSelectedCategory(defaultCategory);
 
         setLoading(false);
@@ -75,28 +79,13 @@ const GalleryPage: React.FC = () => {
 
   // Efek untuk memuat gambar dari kategori yang dipilih
   useEffect(() => {
-    const fetchImagesForCategory = async () => {
+    // Pastikan manifest sudah dimuat sebelum mencoba mengubah kategori
+    if (Object.keys(manifestRef.current).length > 0) {
       setLoading(true);
-      setError(null);
-      setImagesInCurrentCategory([]);
       setMainImageLoaded(false);
-      try {
-        const response = await fetch(`${API_BASE_URL}/${selectedCategory}`);
-        if (!response.ok) {
-          throw new Error("Failed to fetch images for category.");
-        }
-        const images: string[] = await response.json();
-        setImagesInCurrentCategory(images);
-        setCurrentImageIndex(0);
-        setLoading(false);
-      } catch (err) {
-        console.error("Error fetching images for category:", err);
-        setError("Gagal memuat gambar untuk kategori ini.");
-        setLoading(false);
-      }
-    };
-    if (selectedCategory) {
-      fetchImagesForCategory();
+      setCurrentImageIndex(0);
+      setImagesInCurrentCategory(manifestRef.current[selectedCategory] || []);
+      setLoading(false);
     }
   }, [selectedCategory]);
 
