@@ -7,6 +7,7 @@ import PortfolioPage from "./pages/PortfolioPage";
 import GalleryPage from "./pages/GalleryPage";
 import WritingsPage from "./pages/WritingsPage";
 import ConnectPage from "./pages/ConnectPage";
+import WritingModal from "./components/WritingModal";
 
 // Tipe ActiveSection tetap relevan untuk styling navigasi
 export type ActiveSection =
@@ -65,6 +66,7 @@ function App() {
           <Route path="/gallery" element={<GalleryPage />} />
           <Route path="/writings" element={<WritingsPage />} />
           <Route path="/connect" element={<ConnectPage />} />
+          <Route path="/tulisan/:writingSlug" element={<WritingModal />} />
           {/* Tambahkan rute untuk halaman 404 jika diinginkan */}
           {/* <Route path="*" element={<NotFoundPage />} /> */}
         </Routes>

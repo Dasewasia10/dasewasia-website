@@ -1,8 +1,8 @@
 // src/components/WritingModal.tsx
 
 import React, { useEffect, useState, useRef } from "react";
+import { useParams, useNavigate } from "react-router-dom"; // Tambahkan import ini
 import StyledText from "./StyledText";
-
 import sanityClient from "../sanityClient";
 import { PortableText } from "@portabletext/react";
 import { urlFor } from "../imageUrl";
@@ -29,15 +29,9 @@ interface WritingDetail {
   }[];
 }
 
-interface WritingModalProps {
-  writingSlug: string;
-  onClose: () => void;
-}
-
-const WritingModal: React.FC<WritingModalProps> = ({
-  writingSlug,
-  onClose,
-}) => {
+const WritingModal: React.FC = () => {
+  const writingSlug = useParams<{ writingSlug: string }>();
+  const navigate = useNavigate();
   const [writingDetail, setWritingDetail] = useState<WritingDetail | null>(
     null
   );
@@ -68,6 +62,10 @@ const WritingModal: React.FC<WritingModalProps> = ({
     }
     setActiveTooltip(null);
   };
+
+  const onClose = () => {
+    navigate(-1);
+  }
 
   useEffect(() => {
     const fetchWritingDetail = async () => {
