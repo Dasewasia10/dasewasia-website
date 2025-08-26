@@ -30,7 +30,7 @@ interface WritingDetail {
 }
 
 const WritingModal: React.FC = () => {
-  const writingSlug = useParams<{ writingSlug: string }>();
+  const writingSlug = useParams<{ writingSlug: string }>().writingSlug;
   const navigate = useNavigate();
   const [writingDetail, setWritingDetail] = useState<WritingDetail | null>(
     null
