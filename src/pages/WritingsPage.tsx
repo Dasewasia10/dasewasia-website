@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
-import sanityClient from "../sanityClient"; 
-import WritingModal from "../components/WritingModal";
+import { useNavigate } from "react-router-dom";
+import sanityClient from "../sanityClient";
+// import WritingModal from "../components/WritingModal";
 import { format } from "date-fns";
 
 interface Writing {
@@ -20,13 +21,14 @@ interface Writing {
 }
 
 const WritingsPage: React.FC = () => {
+  const navigate = useNavigate();
   const [writings, setWritings] = useState<any[]>([]); // Ganti Writing[] dengan any[] dulu untuk debug
   const [loadingList, setLoadingList] = useState<boolean>(true);
   const [errorList, setErrorList] = useState<string | null>(null);
-  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
-  const [selectedWritingSlug, setSelectedWritingSlug] = useState<string | null>(
-    null
-  );
+  // const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+  // const [selectedWritingSlug, setSelectedWritingSlug] = useState<string | null>(
+  //   null
+  // );
 
   // useEffect hook untuk mengambil daftar tulisan saat komponen pertama kali di-mount
   useEffect(() => {
@@ -62,14 +64,18 @@ const WritingsPage: React.FC = () => {
     fetchWritingsList();
   }, []);
 
-  const openWritingModal = (slug: string) => {
-    setSelectedWritingSlug(slug);
-    setIsModalOpen(true);
-  };
+  // const openWritingModal = (slug: string) => {
+  //   setSelectedWritingSlug(slug);
+  //   setIsModalOpen(true);
+  // };
 
-  const closeWritingModal = () => {
-    setIsModalOpen(false);
-    setSelectedWritingSlug(null); // Reset slug saat modal ditutup
+  // const closeWritingModal = () => {
+  //   setIsModalOpen(false);
+  //   setSelectedWritingSlug(null); // Reset slug saat modal ditutup
+  // };
+
+  const handleCardClick = (slug: string) => {
+    navigate(`/${slug}`);
   };
 
   return (
@@ -100,7 +106,7 @@ const WritingsPage: React.FC = () => {
             <div
               key={writing._id}
               className="bg-white dark:bg-gray-800 rounded-lg shadow-xl p-6 transform transition duration-300 hover:scale-105 hover:shadow-2xl cursor-pointer"
-              onClick={() => openWritingModal(writing.slug.current)} // Ketika kartu diklik, buka modal
+              onClick={() => handleCardClick(writing.slug.current)} // Ketika kartu diklik, buka modal
             >
               {/* Tampilkan gambar jika ada */}
               {writing.mainImage.asset.url && (
@@ -124,19 +130,19 @@ const WritingsPage: React.FC = () => {
               </p>
               {/* Tanggal tulisan */}
               <p className="text-gray-500 dark:text-gray-400 text-xs mb-4">
-                {format(new Date(writing.publishedAt), 'HH:mm, dd/MM/yyyy')}
+                {format(new Date(writing.publishedAt), "HH:mm, dd/MM/yyyy")}
               </p>
             </div>
           ))}
         </div>
       )}
       {/* Render modal jika isModalOpen true dan slug tidak null */}
-      {isModalOpen && selectedWritingSlug !== null && (
+      {/* {isModalOpen && selectedWritingSlug !== null && (
         <WritingModal
           writingSlug={selectedWritingSlug}
           onClose={closeWritingModal}
         />
-      )}
+      )} */}
     </section>
   );
 };

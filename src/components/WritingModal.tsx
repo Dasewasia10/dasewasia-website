@@ -63,9 +63,10 @@ const WritingModal: React.FC = () => {
     setActiveTooltip(null);
   };
 
+
   const onClose = () => {
     navigate(-1);
-  }
+  };
 
   useEffect(() => {
     const fetchWritingDetail = async () => {
