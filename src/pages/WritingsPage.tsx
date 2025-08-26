@@ -75,7 +75,7 @@ const WritingsPage: React.FC = () => {
   // };
 
   const handleCardClick = (slug: string) => {
-    navigate(`/${slug}`);
+    navigate(`/writings/${slug}`);
   };
 
   return (

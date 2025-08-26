@@ -66,7 +66,7 @@ function App() {
           <Route path="/gallery" element={<GalleryPage />} />
           <Route path="/writings" element={<WritingsPage />} />
           <Route path="/connect" element={<ConnectPage />} />
-          <Route path="/tulisan/:writingSlug" element={<WritingModal />} />
+          <Route path="/writings/:writingSlug" element={<WritingModal />} />
           {/* Tambahkan rute untuk halaman 404 jika diinginkan */}
           {/* <Route path="*" element={<NotFoundPage />} /> */}
         </Routes>
