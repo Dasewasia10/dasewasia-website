@@ -1,14 +1,16 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
 import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/24/solid";
 
-// Data mock untuk kategori dan nama gambar.
-const imageManifest: { [key: string]: string[] } = {
-  fanart: ["gochiusa_collab", "kana", "yu_moshikoi"],
-  commission: ["unxinus", "molen_pisang", "green_girl"],
-  "1x1": ["chisa_2024", "sumire_2024", "shizuku_2025", "suzu_2025"],
-};
+// URL untuk endpoint API yang mengembalikan JSON daftar gambar
+const API_BASE_URL = "https://dasewasia.my.id/api/img/drawing";
 
-const BASE_IMAGE_URL = "https://dasewasia.my.id/api/img/drawing";
+// URL untuk direktori gambar yang sebenarnya, sesuai dengan permintaan
+const MATERIAL_IMAGE_URL = "https://material.dasewasia.my.id/img/drawing";
+
+// Tipe data untuk respons dari API
+interface ImageManifest {
+  [category: string]: string[];
+}
 
 const GalleryPage: React.FC = () => {
   const [selectedCategory, setSelectedCategory] = useState<string>("fanart");
@@ -19,25 +21,113 @@ const GalleryPage: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [mainImageLoaded, setMainImageLoaded] = useState<boolean>(false);
+  const [categories, setCategories] = useState<string[]>([]);
 
-  useEffect(() => {
-    // Ketika kategori berubah, reset indeks dan perbarui daftar gambar
-    setLoading(true);
-    setError(null);
-    setMainImageLoaded(false);
-    const images = imageManifest[selectedCategory] || [];
-    setImagesInCurrentCategory(images);
-    setCurrentImageIndex(0);
-    setLoading(false); 
-  }, [selectedCategory]);
+  // Ref untuk menyimpan daftar gambar yang sudah di-pre-load
+  const preloadedImagesRef = useRef<Record<string, HTMLImageElement>>({});
 
-  // Fungsi untuk mendapatkan URL gambar
+  // Fungsi untuk memuat gambar
+  const preloadImage = (url: string) => {
+    if (!preloadedImagesRef.current[url]) {
+      const img = new Image();
+      img.src = url;
+      preloadedImagesRef.current[url] = img;
+    }
+  };
+
+  // Fungsi untuk mendapatkan URL gambar dari direktori material
   const getImageUrl = useCallback(
     (category: string, imageName: string): string => {
-      return `${BASE_IMAGE_URL}/${category}/${imageName}`;
+      // Menggabungkan base URL gambar dengan nama kategori dan nama file, lalu menambahkan ekstensi .png
+      return `${MATERIAL_IMAGE_URL}/${category}/${imageName}.png`;
     },
     []
   );
+
+  // Efek untuk mengambil daftar gambar dari API
+  useEffect(() => {
+    const fetchImageManifest = async () => {
+      setLoading(true);
+      setError(null);
+      try {
+        const response = await fetch(API_BASE_URL);
+        if (!response.ok) {
+          throw new Error("Failed to fetch image manifest.");
+        }
+        const manifest: ImageManifest = await response.json();
+        const allCategories = Object.keys(manifest);
+        setCategories(allCategories);
+
+        const defaultCategory = allCategories.includes("fanart")
+          ? "fanart"
+          : allCategories[0];
+        setSelectedCategory(defaultCategory);
+
+        setLoading(false);
+      } catch (err) {
+        console.error("Error fetching manifest:", err);
+        setError("Gagal memuat daftar kategori dan gambar.");
+        setLoading(false);
+      }
+    };
+    fetchImageManifest();
+  }, []);
+
+  // Efek untuk memuat gambar dari kategori yang dipilih
+  useEffect(() => {
+    const fetchImagesForCategory = async () => {
+      setLoading(true);
+      setError(null);
+      setImagesInCurrentCategory([]);
+      setMainImageLoaded(false);
+      try {
+        const response = await fetch(`${API_BASE_URL}/${selectedCategory}`);
+        if (!response.ok) {
+          throw new Error("Failed to fetch images for category.");
+        }
+        const images: string[] = await response.json();
+        setImagesInCurrentCategory(images);
+        setCurrentImageIndex(0);
+        setLoading(false);
+      } catch (err) {
+        console.error("Error fetching images for category:", err);
+        setError("Gagal memuat gambar untuk kategori ini.");
+        setLoading(false);
+      }
+    };
+    if (selectedCategory) {
+      fetchImagesForCategory();
+    }
+  }, [selectedCategory]);
+
+  // Efek untuk pre-loading gambar
+  useEffect(() => {
+    if (imagesInCurrentCategory.length > 0) {
+      const prevIndex =
+        (currentImageIndex - 1 + imagesInCurrentCategory.length) %
+        imagesInCurrentCategory.length;
+      const nextIndex =
+        (currentImageIndex + 1) % imagesInCurrentCategory.length;
+
+      const prevUrl = getImageUrl(
+        selectedCategory,
+        imagesInCurrentCategory[prevIndex]
+      );
+      const nextUrl = getImageUrl(
+        selectedCategory,
+        imagesInCurrentCategory[nextIndex]
+      );
+
+      // Pre-load gambar sebelumnya dan selanjutnya
+      preloadImage(prevUrl);
+      preloadImage(nextUrl);
+    }
+  }, [
+    currentImageIndex,
+    imagesInCurrentCategory,
+    selectedCategory,
+    getImageUrl,
+  ]);
 
   // Fungsi untuk navigasi gambar
   const navigateImage = useCallback(
@@ -59,7 +149,7 @@ const GalleryPage: React.FC = () => {
     [currentImageIndex, imagesInCurrentCategory.length]
   );
 
-  // Handler untuk keyboard navigation (opsional)
+  // Handler untuk keyboard navigation
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === "ArrowLeft") {
@@ -79,7 +169,6 @@ const GalleryPage: React.FC = () => {
     ? getImageUrl(selectedCategory, currentImageName)
     : "";
 
-  // Dapatkan gambar sebelumnya dan selanjutnya untuk pratinjau
   const getPreviewImage = (offset: number) => {
     if (imagesInCurrentCategory.length === 0) return "";
     const index =
@@ -99,7 +188,7 @@ const GalleryPage: React.FC = () => {
 
       {/* Pemilihan Kategori */}
       <div className="mb-8 flex justify-center flex-wrap gap-3">
-        {Object.keys(imageManifest).map((category) => (
+        {categories.map((category) => (
           <button
             key={category}
             onClick={() => setSelectedCategory(category)}
@@ -110,8 +199,7 @@ const GalleryPage: React.FC = () => {
                   : "bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 hover:bg-blue-100 dark:hover:bg-blue-700"
               }`}
           >
-            {category.charAt(0).toUpperCase() + category.slice(1)}{" "}
-            {/* Kapitalisasi awal */}
+            {category.charAt(0).toUpperCase() + category.slice(1)}
           </button>
         ))}
       </div>
@@ -164,7 +252,7 @@ const GalleryPage: React.FC = () => {
               onError={(e) => {
                 e.currentTarget.src = `https://placehold.co/600x400/ff0000/ffffff?text=Image+Failed+to+Load`;
                 setError("Gagal memuat gambar utama.");
-                setMainImageLoaded(true); // Tetap tampilkan placeholder
+                setMainImageLoaded(true);
               }}
             />
           </div>

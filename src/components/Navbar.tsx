@@ -30,10 +30,10 @@ const Navbar: React.FC<NavbarProps> = ({ activeSection, setActiveSection }) => {
     { id: "gallery", name: "Gallery", icon: PhotoIcon, path: "/gallery" }, // Item baru
     { id: "writings", name: "Writings", icon: BookOpenIcon, path: "/writings" },
     {
-      id: "connect",
-      name: "Connect",
+      id: "whisperbox",
+      name: "Whisperbox",
       icon: PaperAirplaneIcon,
-      path: "/connect",
+      path: "/whisperbox",
     },
   ];
 

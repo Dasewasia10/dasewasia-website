@@ -15,7 +15,7 @@ export type ActiveSection =
   | "portfolio"
   | "gallery"
   | "writings"
-  | "connect";
+  | "whisperbox";
 
 function App() {
   const location = useLocation(); // Hook untuk mendapatkan informasi URL
@@ -31,7 +31,7 @@ function App() {
       "/portfolio": "portfolio",
       "/gallery": "gallery",
       "/writings": "writings",
-      "/connect": "connect",
+      "/whisperbox": "whisperbox",
     };
 
     // Temukan ActiveSection yang sesuai dengan path saat ini
@@ -65,7 +65,7 @@ function App() {
           <Route path="/portfolio" element={<PortfolioPage />} />
           <Route path="/gallery" element={<GalleryPage />} />
           <Route path="/writings" element={<WritingsPage />} />
-          <Route path="/connect" element={<ConnectPage />} />
+          <Route path="/whisperbox" element={<ConnectPage />} />
           <Route path="/writings/:writingSlug" element={<WritingModal />} />
           {/* Tambahkan rute untuk halaman 404 jika diinginkan */}
           {/* <Route path="*" element={<NotFoundPage />} /> */}
