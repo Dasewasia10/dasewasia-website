@@ -55,7 +55,7 @@ const PortfolioPage: React.FC = () => {
     event.stopPropagation();
 
     // Angkat status rahasia
-    setIsSecretRevealed(true);
+    //setIsSecretRevealed(true);
   };
   return (
     <section className="py-8">
