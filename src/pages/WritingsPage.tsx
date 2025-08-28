@@ -66,7 +66,6 @@ const WritingsPage: React.FC = () => {
     };
     fetchWritingsList();
   }, []);
-
   const handleCardClick = (slug: string) => {
     navigate(`/writings/${slug}`);
   };
@@ -84,10 +83,16 @@ const WritingsPage: React.FC = () => {
     startIndex + itemsPerPage
   );
 
+  useEffect(() => {
+    // Reset halaman ke 1 setiap kali filteredWritings berubah.
+    // Ini memastikan kita tidak terjebak di halaman yang tidak ada.
+    setCurrentPage(1);
+  }, [filteredWritings.length]); // Pantau perubahan panjang daftar yang difilter
+
   // Handler untuk pencarian
   const handleSearch = (query: string) => {
     setSearchQuery(query);
-    setCurrentPage(1); // Kembali ke halaman 1 saat pencarian baru
+    // setCurrentPage(1); // Kembali ke halaman 1 saat pencarian baru
   };
 
   // Handler untuk perubahan halaman
