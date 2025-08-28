@@ -98,7 +98,7 @@ const PortfolioPage: React.FC = () => {
               {/* Overlay untuk teks "RAHASIA" */}
               {project.isSecret && !isSecretRevealed && (
                 <div className="absolute inset-0 flex items-center justify-center bg-gray-900 bg-opacity-70 text-white font-bold text-2xl uppercase">
-                  Rahasia
+                  SPOILER
                 </div>
               )}
             </div>
@@ -109,10 +109,12 @@ const PortfolioPage: React.FC = () => {
               }`}
             >
               <h3 className="text-xl font-semibold mb-2 text-gray-800 dark:text-gray-100">
-                {project.title}
+                {project.isSecret || isSecretRevealed ? "???" : project.title}
               </h3>
               <p className="text-gray-600 dark:text-gray-300 text-sm mb-4">
-                {project.description}
+                {project.isSecret || isSecretRevealed
+                  ? "Detail tentang project. Rahasia publik."
+                  : project.description}
               </p>
               {project.link && (
                 <a
