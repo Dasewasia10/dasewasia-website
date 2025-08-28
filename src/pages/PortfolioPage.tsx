@@ -109,10 +109,10 @@ const PortfolioPage: React.FC = () => {
               }`}
             >
               <h3 className="text-xl font-semibold mb-2 text-gray-800 dark:text-gray-100">
-                {project.isSecret || isSecretRevealed ? "???" : project.title}
+                {project.isSecret && isSecretRevealed ? "???" : project.title}
               </h3>
               <p className="text-gray-600 dark:text-gray-300 text-sm mb-4">
-                {project.isSecret || isSecretRevealed
+                {project.isSecret && isSecretRevealed
                   ? "Detail tentang project. Rahasia publik."
                   : project.description}
               </p>
