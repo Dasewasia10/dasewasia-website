@@ -49,7 +49,7 @@ const WritingsPage: React.FC = () => {
                     url
                 }
             }
-        }`;
+        } | order(publishedAt desc)`;
 
       try {
         const data: Writing[] = await sanityClient.fetch(query);
