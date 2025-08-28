@@ -32,7 +32,7 @@ const HomePage: React.FC = () => {
           Lihat Karya Saya
         </a>
         <a
-          href="connect" // Ganti dengan logika navigasi jika tidak pakai anchor
+          href="whisperbox" // Ganti dengan logika navigasi jika tidak pakai anchor
           className="border-2 border-blue-500 text-blue-600 dark:text-blue-400 px-8 py-3 rounded-full text-lg font-semibold transition duration-300 hover:bg-blue-500 hover:text-white dark:hover:text-white"
         >
           Hubungi Saya
